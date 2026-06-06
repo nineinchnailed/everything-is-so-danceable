@@ -139,11 +139,29 @@ While sorting through the most popular techno songs, I found that track names ha
 
     <h3>UNIVARIATE ANALYSIS</h3>
 
+    <h3>Distribution of Danceability</h3>
+
+<iframe
+    src="assets/plots/fig1.html"
+    width="100%"
+    height="600"
+    frameborder="0">
+</iframe>
+
     <p>
 Distribution of Spotify tracks labeled ‘techno’ within its genres, published from 1973 to 2023, ranked 0-1 on danceability. It is likely that techno is quite a danceable genre, presenting one peak in .6-.8 in danceability and a left skew.
     </p>
 
     <h3>BIVARIATE ANALYSIS</h3>
+
+    <h3>Valence vs Popularity</h3>
+
+<iframe
+    src="assets/plots/fig12.html"
+    width="100%"
+    height="600"
+    frameborder="0">
+</iframe>
 
     <p>
 Spotify tracks labeled ‘techno’ within its genres, published from 1973 to 2023, compared on popularity vs valence. There is generally a loose trend in slope and correlation: as valence increases, the popularity of the track decreases
@@ -168,6 +186,8 @@ However, I also found that tracks with missing tempo values tend to be shorter t
     <p>
 To better determine whether the tempo column is truly NMAR, I would want additional information about Spotify's audio-feature extraction process, such as confidence scores for tempo estimates, whether tempo detection failed during processing, or metadata describing why a tempo value is missing. Listening to some of the songs with missing tempos myself, I find that the driving drums of each of the tracks tend to be softer and lack heavy bass, which may hinder tempo recognition.
     </p>
+
+    #SOMEBODYWATCHING
 
     <p>
 Though songs of significantly longer duration presented missing tempo, the observed duration difference of -5828.062 returned a p-value of 0.3142, showing a significantly high chance of a statistically similar to ours or more extreme to occur simply by chance.
