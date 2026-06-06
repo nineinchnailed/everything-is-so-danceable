@@ -106,9 +106,15 @@
 The dataset I am working with is Spotify metadata for songs hosted on its website for streaming, ranging in values from key to “energy” for tracks with release dates from 1927 to 2023. I am studying what makes a song popular, particularly techno tracks. This particular idea stuck out to me, as I am a techno DJ outside of data science (proof below). As a DJ, it is always best to keep in tune with what is most popular with crowds at all times before performing, as it is your duty to keep your audience happy. To the average enjoyer, having a DJ that understands the qualities of what makes a track worth listening to over and over is what will turn a passive listener into a diehard fan.
     </p>
 
+    <img src="assets/images/dj.jpg"
+     alt="DJ performing techno set"
+     style="width:100%; max-width:700px; margin-top:20px; border-radius:10px;">
+
     <p>
 The particular dataset I use to answer my calls has 114000 rows of tracks and 21 columns tied to meaningful metadata collected and analyzed from Spotify, considered the largest paid music streaming service in the world. This data proved particularly useful for my search, as Spotify measures popularity, danceability, and energy for each track. Whereas popularity, key, and time_signature may be easily defined, many of the values are determined by Spotify’s own algorithm to determine subjective values such as valence; I focus on the subjective values provided, as techno strictly follows a 4:4 beat and lives in the same BPM range of 140-160.
     </p>
+
+    
 
     <h2>DATA CLEANING AND EXPLORATORY ANALYSIS</h2>
 
@@ -149,9 +155,7 @@ Spotify tracks labeled ‘techno’ within its genres, published from 1973 to 20
 It does not surprise me to find that the most popular decade for techno was the 2010s, as EDM had gone globally popular that decade. The valence and energy for that decade tended to be the lowest compared to other decades, which also aligns with the general idea that techno is a “dark” and “brooding” genre.
     </p>
 
-    <h2>STEP3</h2>
-
-    <h3>ASSESSMENT OF MISSINGNESS</h3>
+    <h2>ASSESSMENT OF MISSINGNESS</h2>
 
     <p>
 Tempo is the only column in my dataset that contains missing values. I believe tempo may be NMAR (Not Missing At Random) because the missingness could depend on the tempo value itself. For example, Spotify's tempo-detection algorithm may have difficulty estimating tempo for tracks with unusual rhythmic structures, highly variable tempos, ambient sections, or other characteristics directly related to the true tempo. If this is the case, the probability that a tempo value is missing would depend on the unobserved tempo itself, which is the definition of NMAR.
