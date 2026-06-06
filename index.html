@@ -32,7 +32,6 @@
         h1 {
             color: var(--primary);
             font-size: 2.4em;
-            margin-bottom: 10px;
         }
 
         h2 {
@@ -49,6 +48,7 @@
 
         p {
             margin-bottom: 15px;
+            white-space: pre-wrap;
         }
 
         code {
@@ -62,7 +62,6 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
-            background: white;
         }
 
         th {
@@ -101,53 +100,121 @@
         I will cover popular tracks and train a model on techno songs.
     </p>
 
-    <h2>Introduction</h2>
+    <h2>INTRODUCTION</h2>
+
     <p>
-        The dataset I am working with is Spotify metadata for songs ranging from 1927 to 2023.
-        I am studying what makes a song popular, particularly techno tracks.
+The dataset I am working with is Spotify metadata for songs hosted on its website for streaming, ranging in values from key to “energy” for tracks with release dates from 1927 to 2023. I am studying what makes a song popular, particularly techno tracks. This particular idea stuck out to me, as I am a techno DJ outside of data science (proof below). As a DJ, it is always best to keep in tune with what is most popular with crowds at all times before performing, as it is your duty to keep your audience happy. To the average enjoyer, having a DJ that understands the qualities of what makes a track worth listening to over and over is what will turn a passive listener into a diehard fan.
     </p>
 
     <p>
-        As a techno DJ, understanding crowd response is essential to maintaining energy and engagement.
+The particular dataset I use to answer my calls has 114000 rows of tracks and 21 columns tied to meaningful metadata collected and analyzed from Spotify, considered the largest paid music streaming service in the world. This data proved particularly useful for my search, as Spotify measures popularity, danceability, and energy for each track. Whereas popularity, key, and time_signature may be easily defined, many of the values are determined by Spotify’s own algorithm to determine subjective values such as valence; I focus on the subjective values provided, as techno strictly follows a 4:4 beat and lives in the same BPM range of 140-160.
     </p>
 
-    <h2>Data Cleaning and Exploratory Analysis</h2>
+    <h2>DATA CLEANING AND EXPLORATORY ANALYSIS</h2>
 
-    <h3>Data Cleaning</h3>
+    <h3>DATA CLEANING</h3>
+
     <p>
-        Converted <code>release_date</code> to datetime using <code>pd.to_datetime()</code>.
-        Replaced invalid keys (-1) with NaN.
-        Removed duplicate tracks by keeping the highest popularity version.
+Describe, in detail, the data cleaning steps you took and how they affected your analyses. The steps should be explained in reference to the data generating process. Show the head of your cleaned DataFrame (see Part 2: Report for instructions).
     </p>
 
-    <h3>Univariate Analysis</h3>
     <p>
-        Techno tracks are highly danceable, mostly between 0.6 and 0.8, showing a left-skewed distribution.
+The first thing I did was change the format of the ‘release_date’ column for each track from string to datetime with pd.to_datetime(music['release_date'], format='mixed')
+, As many of the dates were improperly formatted with mixed date types, ranging from years only to full YYYY/MM/DD. This way, the column would logically sort and it would be easier to traverse through dates.
     </p>
 
-    <h3>Bivariate Analysis</h3>
     <p>
-        There is a weak negative relationship between valence and popularity.
+Next, I saw that keys that could not be properly processed were labeled -1, though I found none present; I worked on replacing those values with NaN’s instead with .replace(-1, np.nan), just to be sure.
     </p>
 
-    <h3>Interesting Aggregates</h3>
     <p>
-        The 2010s were the most dominant decade for techno music.
+While sorting through the most popular techno songs, I found that track names had been repeating with matching artists and values, but differing track_ids. In order to best represent the most popular techno songs, I only wanted to honor the values of each track once, so I used the values of the more popular version of the track. Songs like “'Mr. Vain” (62 popularity) would only exist as 'Mr. Vain - Original Radio Edit' (68 popularity) in my dataset, instead of appearing twice, and overtraining and mistakenly overfitting the model. I did this by sorting the data by popularity first, then keeping the first most popular song duplicate.
     </p>
 
-    <h2>Assessment of Missingness</h2>
+    <h3>UNIVARIATE ANALYSIS</h3>
+
     <p>
-        Tempo missingness may be NMAR or MAR depending on whether missingness depends on tempo itself or track duration.
+Distribution of Spotify tracks labeled ‘techno’ within its genres, published from 1973 to 2023, ranked 0-1 on danceability. It is likely that techno is quite a danceable genre, presenting one peak in .6-.8 in danceability and a left skew.
     </p>
 
-    <h2>Hypothesis Testing</h2>
+    <h3>BIVARIATE ANALYSIS</h3>
+
+    <p>
+Spotify tracks labeled ‘techno’ within its genres, published from 1973 to 2023, compared on popularity vs valence. There is generally a loose trend in slope and correlation: as valence increases, the popularity of the track decreases
+    </p>
+
+    <h3>INTERESTING AGGREGATES</h3>
+
+    <p>
+It does not surprise me to find that the most popular decade for techno was the 2010s, as EDM had gone globally popular that decade. The valence and energy for that decade tended to be the lowest compared to other decades, which also aligns with the general idea that techno is a “dark” and “brooding” genre.
+    </p>
+
+    <h2>STEP3</h2>
+
+    <h3>ASSESSMENT OF MISSINGNESS</h3>
+
+    <p>
+Tempo is the only column in my dataset that contains missing values. I believe tempo may be NMAR (Not Missing At Random) because the missingness could depend on the tempo value itself. For example, Spotify's tempo-detection algorithm may have difficulty estimating tempo for tracks with unusual rhythmic structures, highly variable tempos, ambient sections, or other characteristics directly related to the true tempo. If this is the case, the probability that a tempo value is missing would depend on the unobserved tempo itself, which is the definition of NMAR.
+    </p>
+
+    <p>
+However, I also found that tracks with missing tempo values tend to be shorter than tracks with recorded tempo values. This suggests that missingness may be related to track duration. If Spotify requires a minimum song length to reliably estimate tempo, then the missingness could instead be explained by duration. In that case, the missingness would be MAR (Missing At Random) rather than NMAR, because it would depend on an observed characteristic of the track.
+    </p>
+
+    <p>
+To better determine whether the tempo column is truly NMAR, I would want additional information about Spotify's audio-feature extraction process, such as confidence scores for tempo estimates, whether tempo detection failed during processing, or metadata describing why a tempo value is missing. Listening to some of the songs with missing tempos myself, I find that the driving drums of each of the tracks tend to be softer and lack heavy bass, which may hinder tempo recognition.
+    </p>
+
+    <p>
+Though songs of significantly longer duration presented missing tempo, the observed duration difference of -5828.062 returned a p-value of 0.3142, showing a significantly high chance of a statistically similar to ours or more extreme to occur simply by chance.
+    </p>
+
+    <p>
+Looking at the distribution of song duration by tempo missingness itself, the distribution of present tempo and missing tempo are essentially the same, with only present tempo featuring far larger outliers in song duration. We can observe that no track longer than 8 minutes had missing tempo.
+    </p>
+
+    <p>
+Though we can suspect MAR may be at play here, since I did not design the original question to consider tempo, I doubt the missingness will create bias in my study, as I will not be using it.
+    </p>
+
+    <p>
+I cannot conclude that missingness of tempo is tied to having low duration_ms. Though this may mean that the missingness of tempo may be missing by design, missing at random, or missing completely at random.
+    </p>
+
+    <h2>HYPOTHESIS TESTING</h2>
+
+    <p>
+Clearly state your null and alternative hypotheses, your choice of test statistic and significance level, the resulting P -value, and your conclusion. Justify why these choices are good choices for answering the question you are trying to answer.
+    </p>
+
+    <p>
+To investigate whether popular modern songs differ from popular older songs, I divided songs into two groups:
+    </p>
+
+    <p>
+Group A: Songs released in 2016 or later with popularity ≥ 70.<br>
+Group B: Songs released before 2016 with popularity ≥ 70.
+    </p>
+
+    <p>
+For each audio feature (energy, danceability, instrumentalness, and acousticness), I conducted a two-sample t-test.
+</p>
+
+    <p>
+Null Hypothesis (H0): The mean value of the feature is the same for modern and older popular songs.<br>
+Alternative Hypothesis (H1): The mean value of the feature differs between modern and older popular songs.
+    </p>
+
+    <p>
+I used a significance level of α=0.01. Because four hypothesis tests were conducted simultaneously, I applied a Bonferroni correction to control the family-wise error rate. The corrected p-values are shown below.
+    </p>
 
     <table>
         <tr>
             <th>Feature</th>
             <th>t-statistic</th>
             <th>p-value</th>
-            <th>Adjusted p-value</th>
+            <th>Bonferroni-adjusted p-value</th>
         </tr>
         <tr>
             <td>Energy</td>
@@ -175,25 +242,97 @@
         </tr>
     </table>
 
-    <h2>Framing a Prediction</h2>
     <p>
-        Linear regression is used to predict popularity from tempo, danceability, and energy.
+A two-sample t-test is appropriate because the goal is to compare the average value of a continuous audio feature between two independent groups of songs. The t-statistic measures the standardized difference in group means, making it suitable for detecting differences between modern and older popular songs. I chose 2016 as the cutoff year because music released within the last seven years is often considered modern, and 2016 represented the earliest year that fit this definition within the dataset.
     </p>
 
-    <h2>Baseline Model</h2>
     <p>
-        RMSE: 19.10, R²: 0.0048 — indicating weak predictive power.
+After applying the Bonferroni correction, the tests for energy, danceability, and acousticness remained statistically significant because their adjusted p-values were below 0.01. The test for instrumentalness was not significant, so there is insufficient evidence to conclude that modern and older popular songs differ in instrumentalness.
     </p>
 
-    <h2>Final Model</h2>
     <p>
-        Ridge regression with engineered features improved RMSE slightly to 19.036.
+These results suggest that modern popular songs tend to have lower energy, higher danceability, and higher acousticness than older popular songs. While the results provide evidence of differences between the groups, they do not prove that release era directly causes these differences, as other factors may influence a song's audio characteristics, considering that music trends feature numerous feedback loops.
     </p>
 
-    <h2>Fairness Analysis</h2>
+    <h2>FRAMING A PREDICTION</h2>
+
     <p>
-        A permutation test comparing RMSE across danceability groups resulted in p = 0.233,
-        indicating no significant performance difference.
+Clearly state your prediction problem and type (classification or regression). If you are building a classifier, make sure to state whether you are performing binary classification or multiclass classification. Report the response variable (i.e. the variable you are predicting) and why you chose it, the metric you are using to evaluate your model and why you chose it over other suitable metrics (e.g. accuracy vs. F1-score).
+    </p>
+
+    <p>
+Can a techno song's popularity be predicted from its audio characteristics?
+I'll be using regression to predict the response variable, popularity, as it is a quantitative variable, serving as a proxy for a song's commercial success and listener engagement on the platform. 
+The features used in the model are:
+        'tempo',
+        'danceability',
+        'energy'
+These features are all audio characteristics that would be available at the time a song is released, from 1927 to 2023. Therefore, they could reasonably be known at the time of prediction. I use linear regression as my initial model because it provides an easily interpretable correlation, allowing me to estimate how each audio feature is associated with popularity. Though the results of this study may not be directly extrapolated to songs today, as popularity and trends of the tracks may have already shifted since 2023.
+To evaluate model performance, I use root mean squared error (RMSE). RMSE measures the typical prediction error for linear regression, and it is expressed in the units of the response variable. I chose RMSE over metrics such as mean absolute error (MAE) as larger prediction errors are penalized more heavily, which is what I’d like when predicting popularity scores.
+    </p>
+
+    <h2>BASELINE MODEL</h2>
+
+    <p>
+Describe your model and state the features in your model, including how many are quantitative, ordinal, and nominal, and how you performed any necessary encodings. Report the performance of your model and whether or not you believe your current model is “good” and why.
+    </p>
+
+    <p>
+There are 11 features in my model, each of which is quantitative, used in linear regression to predict the quantitative popularity value. My baseline model is trained on songs that contain "techno" within their genre (as many subgenres of techno are labeled as _____ techno), attempting to predict the popularity of a track.
+    </p>
+
+    <p>
+RMSE: 19.104417969834355<br>
+R²: 0.004800129760249572
+    </p>
+
+    <p>
+Though the R^2 does not look incredible, I have looked through the stats of the tracks labeled techno and found many non-traditional techno tracks, such as general ‘prog-house ’ had made it into the dataset, even though it does not follow the characteristics of techno. I realize many assortments of EDM in general have made it into my dataset, so I recognize that my model may not be incredibly accurate or strong in determining popularity, while recognizing that my model is too bare.
+    </p>
+
+    <p>
+I also see that the measurements across the features I picked vary widely, from 0-1 to 60-200. I will look into standardizing the measurements next to make the coefficient interpretation much simpler. The sheer number of features that I selected is a bit underwhelming also, and likely limits my model performance. I will look into pulling into a larger data pool.
+    </p>
+
+    <h2>FINAL MODEL</h2>
+
+    <p>
+The final model builds on a baseline linear regression by adding two engineered features designed to better reflect how audio characteristics relate to song popularity. I added energy × loudness, which captures overall track intensity, since louder and more energetic tracks determine higher sonic impact in modern music production, working in synergy to amplify its effects. I added danceability/tempo, to capture how dance-friendly a song is relative to its speed, since songs with similar danceability can be much more tiring at higher BPMs than lower ones.
+    </p>
+
+    <p>
+The model used Ridge Regression to handle multicollinearity among correlated audio features (e.g., energy, loudness, and danceability). All numeric features were standardized, and feature transformations were included within a single sklearn Pipeline to funnel smooth transitions.
+    </p>
+
+    <p>
+Hyperparameters were tuned using 5-fold cross-validation with GridSearchCV, selecting the optimal alpha (regularization strength) from a set of values. The best alpha was determined by the lowest cross-validated RMSE.
+    </p>
+
+    <p>
+Compared to the baseline linear regression model, the final model improves performance by using meaningful feature interactions, stabilizing coefficients with regularization, and improving generalization via cross-validation, resulting in a slightly lower test RMSE of 19.036.
+    </p>
+
+    <h2>FAIRNESS ANALYSIS</h2>
+
+    <p>
+I evaluated the fairness of the final Ridge regression model by comparing its performance across two groups defined by danceability: Group X consists of songs below the median danceability (lower), and Group Y consists of songs at or above the median (upper). Danceability is meaningful as it reflects how suitable a song is for, believe it or not, dance, crucial to EDM and controlling a dancefloor’s energy.
+    </p>
+
+    <p>
+As this is a regression task, I used RMSE as the evaluation metric.
+    </p>
+
+    <p>
+Null hypothesis: The model is fair, and RMSE is the same for both groups; any observed difference is due to pure chance.<br>
+Alternative hypothesis: The model performs worse (higher RMSE) for low-danceability songs, and the difference in RMSE (low − high) shows a statistical significance level >= 0.05.
+    </p>
+
+    <p>
+The test statistic will be RMSE (low − high), performing a permutation test of 1,000 simulations at a significance level of 0.05.
+    </p>
+
+    <p>
+The observed statistic was -0.01 with a p-value of 0.233. Since the p-value is greater than 0.05, we fail to reject the null hypothesis. This suggests there is no statistically significant evidence that the model performs differently across low- and high-danceability songs, and any observed difference in RMSE is likely due to random chance.
     </p>
 
     <footer>
